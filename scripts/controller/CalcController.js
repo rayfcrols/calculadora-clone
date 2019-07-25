@@ -45,7 +45,8 @@ class CalcController {
 
         this.setLastNumberToDisplay();
         this.pasteFromClipboard();
-        document.querySelectorAll('btn-ac').forEach(btn=>{
+        
+        document.querySelectorAll('.btn-ac').forEach(btn=>{
             btn.addEventListener('dblclick', e=>{
                 this.toggleAudio();
             });
@@ -59,11 +60,29 @@ class CalcController {
     }
 
     playAudio(){
-        if (this)
+        if (this._audioOnOff){
+            this._audio.currentTime = 0;
+           this._audio.play(); 
+        }
+    }
+
+    adjustDisplay() {
+        //let value2 = this.displayCalc.toString().length;
+        /*if (value2 > 18){
+            this.setError();
+            return false;
+        } else */if(this.displayCalc.toString().length  > 14) {
+            this._displayCalcEl.style.fontSize = '20px';
+        } else if(this.displayCalc.toString().length  > 12) {
+            this._displayCalcEl.style.fontSize = '30px';
+        } else if(this.displayCalc.toString().length  > 9) {
+            this._displayCalcEl.style.fontSize = '40px';
+        }
     }
 
 
     initKeyboard(){
+        this.playAudio();
 
         document.addEventListener('keyup', e=>{
             switch (e.key){
@@ -120,6 +139,8 @@ class CalcController {
         this._lastNumber = '';
         this._lastOperator = '';
         this.setLastNumberToDisplay();
+        this.adjustDisplay();
+        this._displayCalcEl.style.fontSize = '50px';
     }
 
     clearEntry(){
@@ -147,7 +168,14 @@ class CalcController {
     }
 
     getResult(){
-        return eval(this._operation.join(""));
+        try{
+            return eval(this._operation.join(""));
+        } catch(e){
+            setTimeout(()=>{
+                this.setError();
+            },1);
+        }
+     
     }
 
     calc(){
@@ -247,9 +275,11 @@ class CalcController {
 
     setError(){
         this.displayCalc = "Error";
+        //return false;
     }
 
     execBtn(value){
+        this.playAudio();
         switch (value){
             case 'ac':
                 this.clearAll();
@@ -340,8 +370,28 @@ class CalcController {
     get displayCalc() {
         return this._displayCalcEl.innerHTML;
     }
+    
 
     set displayCalc(value) {
+        
+        if (value.toString().length > 10){
+            this.setError();
+            return false;
+        } 
+
+        //var that = $(this),
+       // textLength = that.val().length;
+       
+        /*
+        let fontSize = parseInt(this._displayCalcEl.style.fontSize);
+        for (let i = fontSize; i >= 0; i--) {
+            let overflow = isOverflown(this._displayCalcEl);
+            if (overflow) {
+            fontSize--;
+            this._displayCalcEl.style.fontSize = fontSize + "px";
+            }
+        }*/
+       // this.adjustDisplay();
         this._displayCalcEl.innerHTML = value;
     }
 
